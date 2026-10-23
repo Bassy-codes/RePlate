@@ -13,6 +13,7 @@ public class PantryAdapter extends RecyclerView.Adapter<PantryAdapter.PantryHold
     private List<PantryItem> pantryItems = new ArrayList<>();
 
     @NonNull
+
     @Override
     public PantryHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
@@ -26,7 +27,26 @@ public class PantryAdapter extends RecyclerView.Adapter<PantryAdapter.PantryHold
         holder.textViewName.setText(currentItem.name);
         holder.textViewQuantityUnit.setText(currentItem.quantity + " " + currentItem.unit);
         holder.textViewExpiry.setText("Expires: " + currentItem.expiryDate);
+
+        // Long-press to delete item
+        holder.itemView.setOnLongClickListener(v -> {
+            int currentPosition = holder.getAdapterPosition();
+
+            // 1. Grab the item on the main thread
+            PantryItem itemToDelete = pantryItems.get(currentPosition);
+
+            // 2. Delete from database using Executor (bypasses the Thread error)
+            java.util.concurrent.Executors.newSingleThreadExecutor().execute(() -> {
+                AppDatabase.getInstance(v.getContext()).pantryDao().delete(itemToDelete);
+            });
+
+            // 3. Remove from the visual list
+            pantryItems.remove(currentPosition);
+            notifyItemRemoved(currentPosition);
+            return true;
+        });
     }
+
 
     @Override
     public int getItemCount() {
