@@ -8,6 +8,8 @@ import java.util.List;
 @Dao
 public interface RecipeDao {
     @Insert
+    void insert(Recipe recipe);
+    @Insert
     void insertAll(List<Recipe> recipes);
 
     @Query("SELECT * FROM recipe_table")

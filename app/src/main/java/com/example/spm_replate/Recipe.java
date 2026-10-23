@@ -10,6 +10,7 @@ class Recipe {
     public String instructions;
     public String ingredientsList; // Stored as comma-separated string e.g., "egg:2,milk:1"
 
+    public Recipe() {}
     public Recipe(String title, String instructions, String ingredientsList) {
         this.title = title;
         this.instructions = instructions;

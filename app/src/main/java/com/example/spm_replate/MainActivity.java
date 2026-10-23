@@ -11,9 +11,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Add test recipes to the database automatically
+        seedTestRecipes();
+
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
 
-        // Load Pantry screen by default on startup
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new PantryFragment()).commit();
@@ -37,5 +39,27 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
+    }
+
+    private void seedTestRecipes() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                AppDatabase db = AppDatabase.getInstance(MainActivity.this);
+                // Only add recipes if the database is empty
+                if (db.recipeDao().getAllRecipes().isEmpty()) {
+                    Recipe pancakes = new Recipe();
+                    pancakes.title = "Pancakes";
+                    pancakes.ingredientsList = "Eggs, Milk, Flour, Butter";
+
+                    Recipe omelette = new Recipe();
+                    omelette.title = "Cheese Omelette";
+                    omelette.ingredientsList = "Eggs, Cheese, Butter";
+
+                    db.recipeDao().insert(pancakes);
+                    db.recipeDao().insert(omelette);
+                }
+            }
+        }).start();
     }
 }
